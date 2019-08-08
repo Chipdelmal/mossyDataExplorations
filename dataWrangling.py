@@ -1,25 +1,57 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+# ############################################################################
+# Data Sources:
+#   https://opendata.dc.gov/datasets/mosquito-trap-sites
+#   https://zenodo.org/search?page=1&size=20&q=Manatee%20County%20Mosquito%20Control%20District
+# ############################################################################
+
 import pandas as pd
 
-
-# https://opendata.dc.gov/datasets/mosquito-trap-sites
-# https://zenodo.org/search?page=1&size=20&q=Manatee%20County%20Mosquito%20Control%20District
+# ############################################################################
+# Set paths and filenames
+# ############################################################################
 PATH = "/Users/sanchez.hmsc/Documents/GitHub/ESRi/"
 FILENAME = "Mosquito_Trap_Sites.csv"
 
-# Load and downcast
-data = pd.read_csv('data/'+ FILENAME)
+# ############################################################################
+# Load raw dataset
+# ############################################################################
+data = pd.read_csv('data/' + FILENAME)
 
-mem = data.memory_usage( deep=True)
+# ############################################################################
+# Do some basic exploration on types and entries
+# ############################################################################
+
+mem = data.memory_usage(deep=True)
 cols = list(data.columns)
 shp = data.shape
+print(cols)
 
-mem
+catsOfInterest = [
+    "TRAPTYPE", "ATTRACTANTUSED",
+    "TRAPCOLLECT", "SETTIMEOFDAY", "COLLECTTIMEOFDAY",
+    "GENUS", "SPECIES",
+     "FEMALESCOLLECTED", "MALESCOLLECTED"
+]
 
-summaryStr = '''
-    Memory: {}
-    Shape: {}
-'''
 
+
+# ############################################################################
+# Catches by trap type
+# ############################################################################
+labels = ["FEMALESCOLLECTED", "MALESCOLLECTED"]
+trapsNumber = data.groupby("TRAPTYPE").count()[labels]
+byTrap = data.groupby("TRAPTYPE").sum()
+byTrap[labels] / trapsNumber
+
+
+
+# ############################################################################
+# Print some stats
+# ############################################################################
+summaryStr = 'Memory: {} \nShape: {}'
 print(summaryStr.format(mem, shp))
 
 
