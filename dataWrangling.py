@@ -18,7 +18,7 @@ FILENAME = "Mosquito_Trap_Sites.csv"
 # ############################################################################
 # Load raw dataset
 # ############################################################################
-data = pd.read_csv('data/' + FILENAME)
+data = pd.read_csv('data/' + FILENAME, parse_dates=["TRAPCOLLECT"])
 
 # ############################################################################
 # Do some basic exploration on types and entries
@@ -30,12 +30,13 @@ shp = data.shape
 print(cols)
 
 catsOfInterest = [
-    "TRAPTYPE", "ATTRACTANTUSED",
-    "TRAPCOLLECT", "SETTIMEOFDAY", "COLLECTTIMEOFDAY",
+    "OBJECTID", "TRAPTYPE", "ATTRACTANTSUSED",
+    "LATITUDE", "LONGITUDE",
+    "SETTIMEOFDAY", "TRAPCOLLECT", "COLLECTTIMEOFDAY",
     "GENUS", "SPECIES",
-     "FEMALESCOLLECTED", "MALESCOLLECTED"
+    "FEMALESCOLLECTED", "MALESCOLLECTED"
 ]
-
+data[catsOfInterest]
 
 
 # ############################################################################
