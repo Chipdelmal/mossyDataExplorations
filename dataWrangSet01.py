@@ -52,7 +52,7 @@ byTrap[labels] / trapsNumber
 
 
 # ############################################################################
-# Print some stats
+# Print variables sets
 # ############################################################################
 summaryStr = 'Memory: {} \nShape: {}'
 print(summaryStr.format(mem, shp))
