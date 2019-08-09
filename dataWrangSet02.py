@@ -5,9 +5,11 @@
 # Data Sources:
 #   https://zenodo.org/search?page=1&size=20&q=Manatee%20County%20Mosquito%20Control%20District
 # ############################################################################
-import pandas as pd
 import glob
-
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+%matplotlib inline
 
 # ############################################################################
 # Setup paths and categories (cats)
@@ -25,7 +27,6 @@ catsOfInterest = [
     'sample_count'
 ]
 catsDates = ['collection_date_start', 'collection_date_end']
-
 # ############################################################################
 # Load raw dataset into data full (daf) and data of interest (doi)
 # ############################################################################
@@ -34,7 +35,7 @@ for file in FILEPATHS:
     dataTemp = pd.read_csv(file, parse_dates=catsDates)
     dataframes.append(dataTemp)
 daf = pd.concat(dataframes, axis=0, ignore_index=True)
-doi[catsOfInterest]
+doi = daf[catsOfInterest]
 
 # ############################################################################
 # Export merged
@@ -43,18 +44,19 @@ daf.to_csv(path_or_buf=(PATH + "Clean/VectorBase_mergedDAF.csv"))
 doi.to_csv(path_or_buf=(PATH + "Clean/VectorBase_mergedDOI.csv"))
 
 
+
 # ############################################################################
-# Do some basic exploration on types and entries
+# Explore
 # ############################################################################
-mem = daf.memory_usage(deep=True)
-cols = list(daf.columns)
-shp = daf.shape
-mem
+doi.info()
+varToCheck = 'species'
+doi[varToCheck].value_counts()
+
 
  ############################################################################
 # Print variables sets
 # ############################################################################
-cats = {}
-for i in cols:
-    cats.update({i: set(daf[i])})
-    print("{}:{}".format(i, set(daf[i])))
+# cats = {}
+# for i in cols:
+#     cats.update({i: set(daf[i])})
+#     print("{}:{}".format(i, set(daf[i])))
