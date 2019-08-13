@@ -7,12 +7,10 @@
 # ############################################################################
 import aux
 import glob
-import datetime
-import numpy as np
+# import datetime
+# import numpy as np
 import pandas as pd
 import apiKeys as keys
-import matplotlib.pyplot as plt
-%matplotlib inline
 
 # ############################################################################
 # Setup paths
@@ -54,10 +52,18 @@ for file in FILEPATHS:
     dataframes.append(dataTemp)
 daf = pd.concat(dataframes, axis=0, ignore_index=True, sort=False)
 # ############################################################################
-#
+# Make weather requests and build a new dataframe (FIX DATE!!!!!!!)
 # ############################################################################
-probe = daf.loc[0]
-(latlong, dates) = (
-    (probe['GPS_lat'], probe['GPS_lon']),
-    (probe['collection_date_start'], probe['collection_date_end'])
-)
+seriesList = []
+for i in range(5):
+    probeVct = daf.loc[i]
+    (latlong, dates, key) = (
+        (probeVct['GPS_lat'], probeVct['GPS_lon']),
+        (probeVct['collection_date_start'], probeVct['collection_date_end']),
+        keys.DKS_API_KEY
+    )
+    probeWeather = aux.requesteAndParseWeather(latlong, dates[0], key)
+    dTemp = probeVct.to_dict()
+    dTemp.update(probeWeather)
+    seriesList.append(dTemp)
+daw = pd.DataFrame(seriesList)
