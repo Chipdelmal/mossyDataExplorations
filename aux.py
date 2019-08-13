@@ -1,6 +1,7 @@
 
 import requests
 
+
 def requestWeather(latlong, datetime, KEY):
     urlFormatStr = "https://api.darksky.net/forecast/{}/{},{}"
     baseReq = urlFormatStr.format(KEY, latlong[0], latlong[1])
@@ -17,3 +18,11 @@ def requestWeather(latlong, datetime, KEY):
 
 def parseWeatherData(requestJSON):
     return requestJSON["daily"]["data"][0]
+
+
+def requesteAndParseWeather(latlong, datetime, API_KEY):
+    req = requestWeather(latlong, datetime, API_KEY)
+    data = parseWeatherData(req)
+    nearestStation = req['flags']['nearest-station']
+    data['nearest-station'] = nearestStation
+    return data
