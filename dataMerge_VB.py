@@ -33,13 +33,12 @@ catsOIVct = [
 catsOIVctDate = ['collection_date_start', 'collection_date_end']
 catsOIWeather = [
     # Precipitation
-    "precipType", "precipProbability", "precipIntensity",
-    "precipIntensityMin", "precipIntensityMax", "precipIntensityError",
+    "precipProbability", "precipIntensity",
     # Temperature
     "temperatureLow", "temperatureHigh",
     "temperatureMin", "temperatureMax", "humidity",
     # Wind/Clouds
-    "windSpeed", "cloudCover"
+    "windSpeed", "cloudCover",
     # Other
     "nearest-station"
 ]
@@ -54,8 +53,9 @@ daf = pd.concat(dataframes, axis=0, ignore_index=True, sort=False)
 # ############################################################################
 # Make weather requests and build a new dataframe (FIX DATE!!!!!!!)
 # ############################################################################
-seriesList = []
-for i in range(5):
+MAX_REQUESTS = 100
+dictsList = []
+for i in range(MAX_REQUESTS):
     probeVct = daf.loc[i]
     (latlong, dates, key) = (
         (probeVct['GPS_lat'], probeVct['GPS_lon']),
@@ -63,7 +63,12 @@ for i in range(5):
         keys.DKS_API_KEY
     )
     probeWeather = aux.requesteAndParseWeather(latlong, dates[0], key)
+    filteredWeather = {cat: probeWeather[cat] for cat in catsOIWeather}
     dTemp = probeVct.to_dict()
-    dTemp.update(probeWeather)
-    seriesList.append(dTemp)
-daw = pd.DataFrame(seriesList)
+    dTemp.update(filteredWeather)
+    dictsList.append(dTemp)
+daw = pd.DataFrame(dictsList)
+# ############################################################################
+# Export the resulting dataframe
+# ############################################################################
+daw.to_csv(path_or_buf=(PATH + "Clean/VectorBase_mergedDAW.csv"))
