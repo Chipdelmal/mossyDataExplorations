@@ -53,7 +53,7 @@ daf = pd.concat(dataframes, axis=0, ignore_index=True, sort=False)
 # ############################################################################
 # Make weather requests and build a new dataframe (FIX DATE!!!!!!!)
 # ############################################################################
-MAX_REQUESTS = 100
+MAX_REQUESTS = 500
 dictsList = []
 for i in range(MAX_REQUESTS):
     probeVct = daf.loc[i]
