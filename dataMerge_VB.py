@@ -12,11 +12,19 @@ import glob
 import pandas as pd
 import apiKeys as keys
 
+print('yes')
+
 # ############################################################################
 # Setup paths
 # ############################################################################
-PATH = "/Volumes/marshallShare/FieldData/"
-FILEPATHS = glob.glob(PATH + "VectorBase*")[0::1]
+PATH = "/Users/Mathieu/marshall_lab/mosq-data/"
+EXPORTPATH = "/Users/Mathieu/marshall_lab/export-data/"
+
+# PATH = "/Volumes/marshallShare/FieldData/"
+# WRITEPATH = PATH + "Clean/VectorBase_mergedDAW.csv"
+
+
+FILEPATHS = glob.glob(PATH + "VectorBase*")
 # ############################################################################
 # Categories of Interest (catsOI)
 # ############################################################################
@@ -53,9 +61,19 @@ daf = pd.concat(dataframes, axis=0, ignore_index=True, sort=False)
 # ############################################################################
 # Make weather requests and build a new dataframe (FIX DATE!!!!!!!)
 # ############################################################################
-MAX_REQUESTS = 500
+MAX_REQUESTS = 10
+# num_rows = count number of rows in csv
+def sum1forline(filename):
+    with open(filename) as f:
+        return sum(1 for line in f)
+num_rows=sum1forline(EXPORTPATH + "/VectorBase_mergedDAW.csv")
+
+# test
+# num_rows=sum1forline(WRITEPATH)
+print('#lines = ', num_rows)
+
 dictsList = []
-for i in range(MAX_REQUESTS):
+for i in range(num_rows, MAX_REQUESTS):
     probeVct = daf.loc[i]
     (latlong, dates, key) = (
         (probeVct['GPS_lat'], probeVct['GPS_lon']),
@@ -71,4 +89,7 @@ daw = pd.DataFrame(dictsList)
 # ############################################################################
 # Export the resulting dataframe
 # ############################################################################
-daw.to_csv(path_or_buf=(PATH + "Clean/VectorBase_mergedDAW.csv"))
+daw.to_csv(path_or_buf=(EXPORTPATH + "/VectorBase_mergedDAW.csv"))
+
+# test
+# daw.to_csv(path_or_buf=(WRITEPATH))
