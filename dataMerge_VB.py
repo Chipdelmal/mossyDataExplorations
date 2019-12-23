@@ -17,7 +17,9 @@ print('yes')
 # ############################################################################
 # Setup paths
 # ############################################################################
+# path to directory mosq-data
 PATH = "/Users/Mathieu/marshall_lab/mosq-data/"
+# path to directory export-data
 EXPORTPATH = "/Users/Mathieu/marshall_lab/export-data/"
 
 # PATH = "/Volumes/marshallShare/FieldData/"
@@ -61,7 +63,8 @@ daf = pd.concat(dataframes, axis=0, ignore_index=True, sort=False)
 # ############################################################################
 # Make weather requests and build a new dataframe (FIX DATE!!!!!!!)
 # ############################################################################
-MAX_REQUESTS = 10
+MAX_REQUESTS = 15
+MAX_REQUESTS_AT_A_TIME = 5
 # num_rows = count number of rows in csv
 def sum1forline(filename):
     with open(filename) as f:
@@ -70,10 +73,14 @@ num_rows=sum1forline(EXPORTPATH + "/VectorBase_mergedDAW.csv")
 
 # test
 # num_rows=sum1forline(WRITEPATH)
+print(EXPORTPATH + "/VectorBase_mergedDAW.csv")
+# num_rows gives (number of rows - 1) for some reason
 print('#lines = ', num_rows)
 
+# somehow this is changing num_rows in VectorBase_mergedDAW.csv
 dictsList = []
-for i in range(num_rows, MAX_REQUESTS):
+# num_rows < MAX_REQUESTS
+for i in range(num_rows, num_rows + MAX_REQUESTS_AT_A_TIME):
     probeVct = daf.loc[i]
     (latlong, dates, key) = (
         (probeVct['GPS_lat'], probeVct['GPS_lon']),
@@ -89,7 +96,12 @@ daw = pd.DataFrame(dictsList)
 # ############################################################################
 # Export the resulting dataframe
 # ############################################################################
-daw.to_csv(path_or_buf=(EXPORTPATH + "/VectorBase_mergedDAW.csv"))
+# replaces csv
+# daw.to_csv(path_or_buf=(EXPORTPATH + "/VectorBase_mergedDAW.csv"))
+# appends csv to bottom of VectorBase_mergedDAW
+daw.to_csv(path_or_buf=(EXPORTPATH + "/VectorBase_mergedDAW.csv"),header=False, mode = 'a')
+# daw.to_csv(path_or_buf=(EXPORTPATH + "/VectorBase_testDAW.csv"),header=False, mode = 'a')
+
 
 # test
 # daw.to_csv(path_or_buf=(WRITEPATH))
