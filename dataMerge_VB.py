@@ -15,6 +15,7 @@ import apiKeys as keys
 # Added by PZ
 import os.path
 from os import path
+import numpy as np
 
 
 # ############################################################################
@@ -75,10 +76,12 @@ MAX_REQUESTS_AT_A_TIME = 10
 
 
 # PZ Count the number of rows of the csv file
+
+#loook at this =)
 def sum1forline(filename):
     with open(filename) as f:
         return sum(1 for line in f)
-num_rows = sum1forline(EXPORTPATH + "/blank.csv")
+
 
 # test
 # num_rows=sum1forline(WRITEPATH)
@@ -91,18 +94,18 @@ dictsList = []
 # num_rows < MAX_REQUESTS
 
 # PZ Given the number of rows, add the requested data to the csv
-for i in range(num_rows, num_rows + MAX_REQUESTS_AT_A_TIME):
-    probeVct = daf.loc[i]
-    (latlong, dates, key) = (
-        (probeVct['GPS_lat'], probeVct['GPS_lon']),
-        (probeVct['collection_date_start'], probeVct['collection_date_end']),
-        keys.DKS_API_KEY
-    )
-    probeWeather = aux.requesteAndParseWeather(latlong, dates[0], key)
-    filteredWeather = {cat: probeWeather[cat] for cat in catsOIWeather}
-    dTemp = probeVct.to_dict()
-    dTemp.update(filteredWeather)
-    dictsList.append(dTemp)
+# for i in range(num_rows, num_rows + MAX_REQUESTS_AT_A_TIME):
+#     probeVct = daf.loc[i]
+#     (latlong, dates, key) = (
+#         (probeVct['GPS_lat'], probeVct['GPS_lon']),
+#         (probeVct['collection_date_start'], probeVct['collection_date_end']),
+#         keys.DKS_API_KEY
+#     )
+#     probeWeather = aux.requesteAndParseWeather(latlong, dates[0], key)
+#     filteredWeather = {cat: probeWeather[cat] for cat in catsOIWeather}
+#     dTemp = probeVct.to_dict()
+#     dTemp.update(filteredWeather)
+#     dictsList.append(dTemp)
     # print(dictsList)
 
 # print(len(daw.columns.values.tolist()))
@@ -130,13 +133,49 @@ daw = pd.DataFrame(dictsList)
 
 def AddOrmakefile(filename):
     if path.isfile(EXPORTPATH + '/' + filename):
+        start = sum1forline(EXPORTPATH + '/' + filename) - 1
+        end = start + MAX_REQUESTS_AT_A_TIME
+
+        for i in range(start, end ):
+            probeVct = daf.loc[i]
+            (latlong, dates, key) = (
+                (probeVct['GPS_lat'], probeVct['GPS_lon']),
+                (probeVct['collection_date_start'], probeVct['collection_date_end']),
+                keys.DKS_API_KEY
+            )
+            probeWeather = aux.requesteAndParseWeather(latlong, dates[0], key)
+            filteredWeather = {cat: probeWeather[cat] for cat in catsOIWeather}
+            dTemp = probeVct.to_dict()
+            dTemp.update(filteredWeather)
+            dictsList.append(dTemp)
+
+        daw = pd.DataFrame(dictsList)
+
+        daw.index = np.arange(start, start+MAX_REQUESTS_AT_A_TIME)
+
         daw.to_csv(path_or_buf=(EXPORTPATH + "/" + filename),header=False, mode = 'a')
+
     else:
+
+        for i in range(0, 0+ MAX_REQUESTS_AT_A_TIME):
+            probeVct = daf.loc[i]
+            (latlong, dates, key) = (
+                (probeVct['GPS_lat'], probeVct['GPS_lon']),
+                (probeVct['collection_date_start'], probeVct['collection_date_end']),
+                keys.DKS_API_KEY
+            )
+            probeWeather = aux.requesteAndParseWeather(latlong, dates[0], key)
+            filteredWeather = {cat: probeWeather[cat] for cat in catsOIWeather}
+            dTemp = probeVct.to_dict()
+            dTemp.update(filteredWeather)
+            dictsList.append(dTemp)
+
+        daw = pd.DataFrame(dictsList)
         # create a new file and add the data into it
         daw.to_csv(path_or_buf=(EXPORTPATH + "/" + filename),header=True, mode = 'w')
 
 AddOrmakefile("test.csv")
-AddOrmakefile('pie.csv')
+# AddOrmakefile('pie.csv')
 
 # checkOrmake_file("VectorBase_mergedDAW.csv")
 
